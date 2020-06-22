@@ -32,7 +32,7 @@ const EnergySensor=require('./Model/sensor.model');
 const app = express();
 app.use(express.json());
 app.use(cors());
-// app.use(express.static('build'));
+app.use(express.static('build'));
 app.use(compression());
 
 //database connectivity
@@ -148,8 +148,8 @@ app.use('/energysensor',sensorRouter);
 app.use('/logs',logsRouter);
 app.use('/threshole',thresholeRouter);
 app.use('/user', userRouter);
-// app.get('/*', (req, res) => {
-//    res.sendFile( path.resolve(__dirname,'build', 'index.html') );
-//  });
+app.get('/*', (req, res) => {
+   res.sendFile( path.resolve(__dirname,'build', 'index.html') );
+ });
 
 module.exports = app;
