@@ -8,6 +8,7 @@ const sensorRouter=require('./Router/sensor');
 const logsRouter=require('./Router/logs');
 const thresholeRouter=require('./Router/threshole');
 const userRouter = require('./Router/user');
+const adminRouter = require('./Router/admin');
 const http=require('http');
 const socketio=require('socket.io');
 const axios=require('axios');
@@ -148,6 +149,7 @@ app.use('/energysensor',sensorRouter);
 app.use('/logs',logsRouter);
 app.use('/threshole',thresholeRouter);
 app.use('/user', userRouter);
+app.use('/admin',adminRouter);
 app.get('/*', (req, res) => {
    res.sendFile( path.resolve(__dirname,'build', 'index.html') );
  });
