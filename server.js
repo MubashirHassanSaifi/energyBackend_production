@@ -9,24 +9,24 @@ const logsRouter=require('./Router/logs');
 const thresholeRouter=require('./Router/threshole');
 const userRouter = require('./Router/user');
 const adminRouter = require('./Router/admin');
-const http=require('http');
-const socketio=require('socket.io');
-const axios=require('axios');
+const http = require('http');
+const socketio = require('socket.io');
+const axios = require('axios');
 const cron = require('node-cron');
 //-------------------------------------------------------------------
-const notifications=require('./functions/alerts')
-const checkThreshole=require('./functions/threshole')
-const update_Va=require('./functions/sensor/Va_update');
-const update_Vb=require('./functions/sensor/Vb_update');
-const update_Vc=require('./functions/sensor/Vc_update');
-const update_Ia=require('./functions/sensor/Ia_update');
-const update_Ib=require('./functions/sensor/Ib_update');
-const update_Ic=require('./functions/sensor/Ic_update');
-const update_Pf=require('./functions/sensor/Pf_update');
-const update_PA=require('./functions/sensor/PA_update');
-const update_PR=require('./functions/sensor/PR_update');
-const update_U=require('./functions/sensor/U_update');
-const EnergySensor=require('./Model/sensor.model');
+const notifications = require('./functions/alerts')
+const checkThreshole = require('./functions/threshole')
+const update_Va = require('./functions/sensor/Va_update');
+const update_Vb = require('./functions/sensor/Vb_update');
+const update_Vc = require('./functions/sensor/Vc_update');
+const update_Ia = require('./functions/sensor/Ia_update');
+const update_Ib = require('./functions/sensor/Ib_update');
+const update_Ic = require('./functions/sensor/Ic_update');
+const update_Pf = require('./functions/sensor/Pf_update');
+const update_PA = require('./functions/sensor/PA_update');
+const update_PR = require('./functions/sensor/PR_update');
+const update_U = require('./functions/sensor/U_update');
+const EnergySensor = require('./Model/sensor.model');
 //--------------------------------------------------------------------
 
 //create server object

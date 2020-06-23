@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const joi = require('@hapi/joi');
 const bcrypt = require('bcrypt');
 const verify = require('../middleware/userTokenVerify');
+const ipLog = require('../functions/ipLogs');
 
 
 // Validation
@@ -93,7 +94,7 @@ const verify = require('../middleware/userTokenVerify');
 
 router.route('/login').post( async (req,res)=> {
   try{
-    const err   = loginSchema.validateAsync(req.body);
+    const err = loginSchema.validateAsync(req.body);
   }
   catch(err)
   {
@@ -121,6 +122,7 @@ router.route('/login').post( async (req,res)=> {
   if(!verifyPass){
     res.status(400).send("inValid password");
   }
+  ipLog(user._id, user.username);
   const token = jwt.sign({
       id: user._id,
       name: user.username,
@@ -166,6 +168,7 @@ router.route('/changePassword').post( async(req,res)=>{
          const hashPassword = await bcrypt.hashSync(newPassword,salt);
          user.password = hashPassword;
          const passwordChanged = await user.save();
+
          if(passwordChanged)
          res.json('password updated');
         }

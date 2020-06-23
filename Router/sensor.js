@@ -145,39 +145,39 @@ router.route('/update/:id').post( async(req,res)=>{
       checkThreshole(io,sensorid,Va,Vb,Vc,Ia,Ib,Ic,Pf,U);
     
      try{
-      const sensor =await EnergySensor.findById(sensorid);
+      const sensor = await EnergySensor.findById(sensorid);
      if(sensor){
-      const userid=sensor.userid;
+      const userid = sensor.userid;
     
      
     
      //update Va
    //   updateSensor(sensorid, userid, 'Va', Va);
-     update_Va(io,sensorid,userid,Va,res);
+     update_Va(io, sensorid, userid, Va, res);
 
      //UPDATE Vb
    //   updateSensor(sensorid, userid, 'Vb', Vb);
-     update_Vb(io,sensorid,userid,Vb,res);
+     update_Vb(io, sensorid, userid, Vb, res);
 
      //update Vc
    //   updateSensor(sensorid, userid, 'Vc', Vc)
-     update_Vc(io,sensorid,userid,Vc,res);
+     update_Vc(io, sensorid, userid, Vc, res);
 
     //update Ia
    //  updateSensor(sensorid, userid, 'Ia', Ia)
-    update_Ia(io,sensorid,userid,Ia,res);
+    update_Ia(io, sensorid, userid, Ia, res);
     
     //update Ib
    //  updateSensor(sensorid, userid, 'Ib', Ib)
-    update_Ib(io,sensorid,userid,Ib,res);
+    update_Ib(io, sensorid, userid, Ib, res);
 
     //update Ic
    //  updateSensor(sensorid, userid, 'Ic', Ic)
-    update_Ic(io,sensorid,userid,Ic,res);
+    update_Ic(io, sensorid, userid, Ic, res);
     
     //update Pf
    //  updateSensor(sensorid, userid, 'Pf', Pf)
-    update_Pf(io,sensorid,userid,Pf,res);
+    update_Pf(io, sensorid, userid, Pf, res);
 
    //  //update A
    //  update_A(sensorid,userid,A,res);
@@ -187,15 +187,15 @@ router.route('/update/:id').post( async(req,res)=>{
 
     //update PA
    //  updateSensor(sensorid, userid, 'PA', PA)
-    update_PA(io,sensorid,userid,PA,res);
+    update_PA(io, sensorid, userid, PA, res);
 
     //updata PR
    //  updateSensor(sensorid, userid, 'PR', PR)
-    update_PR(io,sensorid,userid,PR,res);
+    update_PR(io, sensorid, userid, PR, res);
 
     //updata U
    //  updateSensor(sensorid, userid, 'U', U, res)
-    update_U(io,sensorid,userid,U,res);
+    update_U(io, sensorid, userid, U, res);
     
     }
     }

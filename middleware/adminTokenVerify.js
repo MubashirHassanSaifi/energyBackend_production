@@ -2,7 +2,7 @@ const { verify } = require("jsonwebtoken");
 
 const jwt = require('jsonwebtoken');
 
-module.exports = (req, res, next) => {
+module.exports = async(req, res, next) => {
     const token = req.headers.auth;
     if(!token){
         res.status(401).send({

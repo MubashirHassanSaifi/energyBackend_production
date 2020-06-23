@@ -5,6 +5,7 @@ const Admin = require('../Model/admin.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const verify = require('../middleware/adminTokenVerify');
+const Ip = require('../Model/ipLog.model');
 
 // Admin register Schema 
 const registerSchema = joi.object({
@@ -126,6 +127,31 @@ router.get('/auth', verify, async(req, res) => {
    }
     
     
+
+
+});
+
+//_____________________________Login History_________
+
+router.route('/loginhistory').get(async(req, res) => {
+
+    try{
+        const history = await Ip.find();
+        res.send(history);
+
+} catch(err){
+    res.status(400).send(err);
+}
+});
+
+//______________________________User Details___________
+router.route('/userinfo').get(async(req,res) => {
+try{
+    const user = await User.find();
+    res.send(user);
+}catch(err){
+    res.status(400).send(err);
+}
 
 });
 

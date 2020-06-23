@@ -3,10 +3,7 @@ const Valog=require('../../Model/Logs/Va.model');
 const updateNotify = require('../updateNotify');
 const moment =require('moment');
 
-const update_Va=async(io,sensorid,userid,Va)=>{
-  
-  
-  
+const update_Va = async(io,sensorid,userid,Va) => {
   try{
         const sensor =await EnergySensor.findById(sensorid);
         if(sensor){
