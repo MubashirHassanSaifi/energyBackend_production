@@ -17,17 +17,19 @@ const registerSchema = joi.object({
 // Admin login Schema 
 const loginSchema = joi.object({
     username: joi.string().required(),
-    password: joi.string().min(7).required()
+    password: joi.string().min(3).required()
 });
 
-// ____________________Admin Register________________________
+// _________________________Admin Register________________________
 
 router.route('/register').post( async(req, res) => {
-try{
+
+    try{
     const err = await registerSchema.validateAsync(req.body);
 } catch(err){
     res.status(400).send(err.details[0].message);
 }
+    
 const username = await Admin.findOne({
     username: req.body.username
 });
@@ -40,8 +42,8 @@ const email = await Admin.findOne({
 if(email){
     res.status(400).send('Email is already exist');
 }
-const salt = bcrypt.genSalt(10);
-const hashPassword = bcrypt.hashSync(req.body.password, salt);
+const salt = await bcrypt.genSalt(10);
+const hashPassword = await bcrypt.hashSync(req.body.password, salt);
 
 const admin = new Admin({
     username: req.body.username,
@@ -55,8 +57,7 @@ const token = jwt.sign({
     id: adminCreated._id,
     username: adminCreated.username,
     email: adminCreated.email,
-    profilePic: adminCreated.profilePic
-}, 
+    profilePic: adminCreated.profilePic,}, 
 process.env.USER_TOKEN_KEY,
 );
 res.send({
@@ -71,7 +72,7 @@ res.send({
 
 });
 
-//______________Admin Login_______________
+//__________________________Admin Login_______________
 
 router.route('/login').post( async(req, res) => {
   try{
@@ -100,7 +101,7 @@ res.header('auth', token).send({
         id: admin._id,
         username: admin.username,
         email: admin.email,
-        profilePic: admin.profilePic
+        profilePic: admin.profilePic,
         },
     token
 });
@@ -109,9 +110,9 @@ res.header('auth', token).send({
 //_____________________________Auth___________________
 
 router.get('/auth', verify, async(req, res) => {
-   try{
+    try{
     const admin = await Admin.findOne({
-        _id: req.admin._id
+        _id: res.admin.id
     });
     res.send({
         admin: {
@@ -123,7 +124,7 @@ router.get('/auth', verify, async(req, res) => {
 
     });
    } catch (err){
-       res.send(401).send(err);
+       res.status(401).send(err);
    }
     
     
@@ -149,10 +150,18 @@ router.route('/userinfo').get(async(req,res) => {
 try{
     const user = await User.find();
     res.send(user);
-}catch(err){
+} catch(err){
     res.status(400).send(err);
 }
-
 });
 
+//_______________________________Delete User___________
+router.route('/delete').post( async(req, res) => {
+  try{
+    const deleted = await User.findByIdAndDelete(req.body.id);
+    res.send("User Deleted")
+} catch(err){
+    res.status(400).send(err);
+}
+    });
 module.exports = router;

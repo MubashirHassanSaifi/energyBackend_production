@@ -1,19 +1,25 @@
 const EnergySensor=require('../Model/sensor.model');
+const thresholdTrack = require('../functions/thresholdTrack');
 const router=require('express').Router();
+
 
 
 // add  V_upper limit
 router.route('/add_upper_V/:id').post(async (req,res)=>{
    const sensorid = req.params.id;
-   const V_upperLmt=req.body.V_upperLmt;
+   const V_upperLmt = req.body.V_upperLmt;
+   
    //checkUpperLimit(V_upperLimit);
- const sensor =await EnergySensor.findById(sensorid);
+ const sensor = await EnergySensor.findById(sensorid);
+ 
  try{
      if(sensor){
-                 sensor.V_upperLmt=V_upperLmt;
+                 
+                 sensor.V_upperLmt = V_upperLmt;
                  const updateUpper_V  = await sensor.save();
                 try{
                   if(updateUpper_V)
+                 
                   res.status(200).json(`V_upper Limit is set `)
                   }
                 catch(err){
@@ -67,14 +73,20 @@ else{
 
 //add I_upperlimet
 router.route('/add_upper_I/:id').post(async(req,res)=>{
-    const id= req.params.id;
-    const I_upperLmt= req.body.I_upperLmt;
+    const id = req.params.id;
+    const I_upperLmt = req.body.I_upperLmt;
+    const userid = req.body.userid;
+    let prev_Val;
+    let new_Val;
     try{
     const sensor = await EnergySensor.findById(id);
     if(sensor){
-        sensor.I_upperLmt=I_upperLmt;
+        prev_Val = sensor.I_upperLmt;
+        sensor.I_upperLmt = I_upperLmt;
        const sensorSaved = await sensor.save();
        if(sensorSaved){
+           new_Val = sensorSaved.I_upperLmt;
+           thresholdTrack(userid, prev_Val, new_Val);
            res.status(200).send(`current upper limit is set`);
        }
 

@@ -66,17 +66,16 @@ router.route('/add').post(async (req,res)=>{
  const {error}=await sensorAddSchema.validateAsync(req.body);
          if(error)
             return res.status(400).send(error.detail[0].message);
-       const userid=req.body.userid;
+       const userid = req.body.userid;
        const user = await User.findOne({userid})
    if(!user){
       res.status(400).json("inCorrect Userid");
    }  
-   const sensor=new EnergySensor({
+   const sensor= new EnergySensor({
     userid:userid,
-   
-}) 
+   }) 
 
-   const sensorSaved =await sensor.save();
+   const sensorSaved = await sensor.save();
    if(sensorSaved)
    res.status(200).json(`Energy Sensor is added for ${user.username}`)
 }
@@ -137,7 +136,7 @@ router.route('/update/:id').post( async(req,res)=>{
       // let time=date.toLocaleTimeString();
       // let timeDate =newDate+ '  '+ time;
       
-      console.log("hekki   ")
+     
       //generate notifications 
       notifications(io,sensorid,Va,Vb,Vc,Ia,Ib,Ic,U);
       
