@@ -31,7 +31,7 @@ const updateSensor = require('../functions/sensor/updateSensor');
 
 //schema add Sensor
 const sensorAddSchema = joi.object({
-   userid:joi.string().required(),
+   sensorName:joi.string().required(),
    });
 // schema update sensor
 const sensorUpdateSchema = joi.object({
@@ -65,19 +65,24 @@ router.route('/add').post(async (req,res)=>{
    //check the schema
  const {error}=await sensorAddSchema.validateAsync(req.body);
          if(error)
-            return res.status(400).send(error.detail[0].message);
-       const userid = req.body.userid;
+   return res.status(400).send(error.detail[0].message);
+       const userid = req.body.sensorName;
        const user = await User.findOne({userid})
-   if(!user){
-      res.status(400).json("inCorrect Userid");
+       const sensorExt= await EnergySensor.findOne({userid});
+       if(sensorExt){
+      return res.status(400).json("This sensor is already assigned");
    }  
-   const sensor= new EnergySensor({
-    userid:userid,
+   const username = user.username;
+   user.sensor = true;
+   user.save();
+   const sensor = new EnergySensor({
+   userid,
+   username
    }) 
-
+    
    const sensorSaved = await sensor.save();
    if(sensorSaved)
-   res.status(200).json(`Energy Sensor is added for ${user.username}`)
+   res.send(`Energy Sensor is added for ${user.username}`);
 }
 catch(err){
    res.status(400).json(`sensor is not saved due to ${err}`);
@@ -89,8 +94,9 @@ catch(err){
 //get sensor data
 router.route('/get/:userid').get(async(req,res)=>{
    const userid = req.params.userid;
+  
   try{
-   const data = await EnergySensor.find({userid});
+   const data = await EnergySensor.findOne({userid});
    res.json(data);
   }
   catch(err){
@@ -99,12 +105,50 @@ router.route('/get/:userid').get(async(req,res)=>{
   }
 });
 
+//get all sensors
+router.route('/getAllSensors').get(async (req, res) => {
+   try{
+      const data = await EnergySensor.find();
+      const columns = [{
+            name: '_id',
+            label: 'Sensor_ID'
+         },
+         {
+            name: 'userid',
+            label: 'Sensor Name'
+         },
+         {
+            name: 'username',
+            label: 'Assigned To'
+         },
+         {
+            name: 'createdAt',
+            label: 'Created_At'
+         }
+
+      ]
+      res.json({
+         data,
+         columns
+      }); 
+
+   } catch(err){
+      res.status(400).send(err);
+   }
+});
+
 //delete sensor
-router.route('/delete/:id').delete(async(req,res)=>{
-   const id =req.params.id;
-    await EnergySensor.findByIdAndDelete(id)
-    .then(()=>res.status(200).json(`sensor is deleted`))
-    .catch((err)=>res.status(400).json(`sensor is not delte due to ${err}`));
+router.route('/delete').delete(async(req,res)=>{
+   console.log(req.body);
+    try {
+   await EnergySensor.findOneAndDelete({userid: req.body.sensor})
+   const user = await User.findOne({userid: req.body.sensor});
+   user.sensor = false;
+   await user.save();
+   res.send('Senser deleted');
+    } catch(err){
+       res.status(400).send(err);
+    }
 });
 
 //-----------------------------------------------updata sensor----------------------------------------------

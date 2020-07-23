@@ -10,9 +10,19 @@ const ipLog = require('../functions/ipLogs');
 // Validation
  const registerSchema = joi.object({
      username: joi.string().required(),
-     userid: joi.string().required(),
+     userid: joi.string().lowercase().required(),
      email: joi.string().required(),
      password: joi.string().required().min(7),
+     phone: joi.allow(null),
+     state: joi.allow(null),
+     region: joi.allow(null),
+     country: joi.allow(null)    
+     //  location:{
+    //      state: joi.string(),
+    //      region: joi.string(),
+    //      country: joi.string()
+    //  }
+
 
  });
 
@@ -24,32 +34,34 @@ const ipLog = require('../functions/ipLogs');
  //___________________user Registration______________________________
 
  router.route('/register').post( async (req,res)=>{
-    console.log(req.body); 
+  
     try{
     const err = await registerSchema.validateAsync(req.body);
-    console.log(err); 
     }
      catch (err){
         return res.status(400).send(err.details[0].message);
      }
-     
      const username = req.body.username;
      const userid = req.body.userid;
      const email= req.body.email;
      const password = req.body.password;
+     const phone = req.body.phone;
+     const state = req.body.state;
+     const region = req.body.region;
+     const country = req.body.country;
      const salt = await bcrypt.genSalt(10);
      const hashPassword = bcrypt.hashSync(password,salt);
 
      // check username is already exist or not
      const userIdExist = await User.findOne({userid});
      if(userIdExist){
-         res.status(400).json('This userID is already exist');
+      return res.status(400).json('This Sensor name is already assigned');
      }
 
      // check email is already exist or not
      const emailExist = await User.findOne({email});
      if(emailExist){
-         res.status(400).json('Email is already exist');
+      return  res.status(400).json('Email is already exist');
      }
 
      //Save the user data
@@ -58,7 +70,13 @@ const ipLog = require('../functions/ipLogs');
         username,
         userid,
         email,
-        password:hashPassword
+        password:hashPassword,
+        phone,
+        location:{
+            state,
+            region,
+            country
+        }
 
      });      
 
@@ -205,12 +223,21 @@ if(user){
 
 //______________________________update user________________________
 router.route('/update/:id').post(async(req,res)=>{
+    
     const username = req.body.username;
     const email = req.body.email;
+    const phone = req.body.phone;
+    const country = req.body.country;
+    const region = req.body.region;
+    const state = req.body.state;
     try{
         const user = await User.findById(req.params.id);
         user.username = username;
         user.email = email;
+        user.phone = phone;
+        user.location.country = country;
+        user.location.region = region;
+        user.location.state = state;
         const userSaved = await user.save();
         res.json({
             message: 'user updated successfully'
@@ -220,10 +247,63 @@ catch(err){
     res.status(400).json('Sorry! user is not updated');
 
 }
-    
-    
-
-    
 });
+//______________________________check user sensor Assigned____________
+router.route('/sensorAssignedUsers').get(async(req, res) => {
+    try{
+     const user = await User.find({sensor: false});
+     const columns = [
+        {
+            name: 'userid',
+            label: 'Sensor Name'
+        },
+        {
+            name: '_id',
+            label: 'User Id'
+        },
+        {
+            name: 'username',
+            label: 'User Name'
+        }
+     ];
+     let arr = [];
+     user.map((f) => {
+         let obj = {
+             name: f.userid,
+             id: f._id,
+             
+         };
 
+         arr.push(obj);
+     });
+
+    
+    
+    
+     res.send({
+         data: user,
+         columns,
+         sensor: arr
+     });
+
+    } catch(err){
+        res.status(400).send(err);
+    }
+
+});
+//_______________________________getuserData according to sensor________
+router.route('/sensorAgainstUser').post( async(req ,res) => {
+   
+    try{
+        const user = await User.findOne({userid: req.body.sensor});
+        res.send({
+            id: user._id,
+            name: user.username
+        })
+
+
+    } catch(err){
+        res.status(400).send(err);
+    }
+});
 module.exports = router;

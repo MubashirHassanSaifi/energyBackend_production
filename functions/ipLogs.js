@@ -2,11 +2,15 @@ const Ip = require('../Model/ipLog.model');
 const moment = require('moment');
 // const { model } = require('../Model/ipLog.model');
 const axios = require('axios');
+const publicIp = require("public-ip");
 
 const Iplog = async(userid, username) => {
     
    try{
-    const usrTrack = await axios.get('http://api.ipstack.com/43.251.254.100?access_key=2c8c6151e6dc48613d51dc473cceb66b');
+    const pubIp  = await publicIp.v4();
+    const usrTrack = await axios.get(`http://api.ipstack.com/${pubIp}?access_key=2c8c6151e6dc48613d51dc473cceb66b`);
+    
+
     console.log(usrTrack.data.ip);
     const log = new Ip({
         userid,

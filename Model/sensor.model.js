@@ -3,6 +3,7 @@ const Schema=mongoose.Schema;
 
 const sensorSchema= new Schema({
 userid:{type:String,required:true},
+username:{type:String, default:null},
 Va:{type:Number,default:0},
 Vb:{type:Number,default:0},
 Vc:{type:Number,default:0},
