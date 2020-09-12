@@ -3,6 +3,7 @@ const cors=require('cors');
 const mongoose=require('mongoose');
 require('dotenv').config();
 const path = require('path');
+const fs = require('fs');
 const compression = require('compression');
 const sensorRouter=require('./Router/sensor');
 const logsRouter=require('./Router/logs');
@@ -34,6 +35,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.static('build'));
+app.use(express.static('Email-Template'));
 app.use(compression());
 
 //database connectivity
@@ -43,7 +45,7 @@ const connection = mongoose.connection;
 connection.once('open',() => console.log(`MongoDB connection is established`));
 
 //port
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 const server = app.listen(port , console.log(`server is running on port ${port}`));
 
 //
@@ -64,12 +66,16 @@ io.on('connection',(socket)=>{
    });
    
    socket.emit('message','you are connected');
+  
+   
 
    //update------------------------------------------
    socket.on("Values",async(data)=>{
    
 
       console.log(data);
+   
+      
       
       const Va = data.voltage.Va;
       const Vb = data.voltage.Vb;
@@ -143,7 +149,6 @@ io.on('connection',(socket)=>{
     return io;
 
    });
-
 app.set('socketio', io);
 app.use('/energysensor',sensorRouter);
 app.use('/logs',logsRouter);

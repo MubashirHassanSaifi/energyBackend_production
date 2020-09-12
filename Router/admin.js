@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const joi = require('@hapi/joi');
-const nodemailer = require('nodemailer');
 const User = require('../Model/user.model');
 const Admin = require('../Model/admin.model');
 const bcrypt = require('bcrypt');
@@ -10,8 +9,15 @@ const Ip = require('../Model/ipLog.model');
 const ThresholdTracker = require('../Model/thresholdTrack.model');
 const thresholdTrack = require('../functions/thresholdTrack');
 const Complaint = require('../Model/complaint.model');
-const { route } = require('./sensor');
-const unirest = require('unirest');
+// const unirest = require('unirest');
+// const mailgun = require('mailgun-js');
+const path = require('path');
+const nodemailer = require("nodemailer");
+const mg = require("nodemailer-mailgun-transport");
+const hbs = require("nodemailer-express-handlebars");
+const axios = require('axios');
+
+
 // Admin register Schema 
 const registerSchema = joi.object({
     username: joi.string().required(),
@@ -279,62 +285,69 @@ router.route('/complaintStatus').post( async (req ,res) => {
         });
 
 //_________________________________Email Sending_________________________________
-router.route('/email').get(async (req, res) => {
-    // var req = unirest("GET", "https://apidojo-17track-v1.p.rapidapi.com/carriers/list");
-
-    // req.headers({
-    //     "x-rapidapi-host": "apidojo-17track-v1.p.rapidapi.com",
-    //     "x-rapidapi-key": "1bfb97c257mshc0119a4a50fc409p118688jsn19cd887ed5cb",
-    //     "useQueryString": true
-    // });
-
-
-    // req.end(function (res) {
-    //     if (res.error) throw new Error(res.error);
-
-    //     console.log(res.body);
-    // });
-
-
-       const from = req.body.from;
+router.route('/email').post(async (req, res) => {
+    console.log(req.body);
+   const from = req.body.from;
    const to = req.body.to;
    const sub = req.body.subject;
-   const msg = req.body.message;
-   
-    // configure mail
-    const transport = nodemailer.createTransport({
-        host: "smtp.mailtrap.io",
-        port: 465,
-        auth: {
-            user: "34a1d07b62e18f",
-            pass: "0bf2f9415b0517"
-        }
-    });
-   const mailOptions = {
-       from: sfrom,
-       to: to,
-       subject: sub,
-       text: msg,
-    //    html: '<b>Hey there! </b><br> This is our first message sent with Nodemailer<br /><img src="cid:uniq-mailtrap.png" alt="mailtrap" />',
-    //    attachments: [{
-    //        filename: 'mailtrap.png',
-    //        path: __dirname + '/mailtrap.png',
-    //        cid: 'uniq-mailtrap.png'
-    //    }]
-   };
-   
-   //send email 
-   try {
-    const info = await transport.sendMail(mailOptions);
-    res.send(info);
-   }catch(err){
-       res.status(400).send(err);
-   }
-   
+
+// MAIL GUN -------
+const auth = {
+  auth: {
+    api_key: process.env.MAILGUN_APIKEY,
+    domain: process.env.MAILGUN_DOMAIN,
+  },
+};
+const transport = nodemailer.createTransport(mg(auth));
+const url = `http://localhost:5000/admin/emailVerify/${to}`
+const mailOptions = {
+   from: from,
+   to: to,
+   subject: sub,
+   text: 'This is testing',
+   html: '<Table border=0 >'+
+          '<tr><td><h2>Email Varification</h2></td></td>'+
+          '<tr><td></td></tr>'+
+           '<tr><td>Please confirm your email address by clicking the link below.</td></tr>' +
+        '<tr><td>We may need to send you critical information about our service and it is important that we have an accurate email address.</td></tr>' +
+           `<tr><td colspan="2"><a style="font-family: Helvetica Neue ,Helvetica,Arial,sans-serif; cursor:pointer; box-sizing: border-box; font-size: 14px; color: #FFF; text-decoration: none; line-height: 2em; font-weight: bold; text-align: center; cursor: pointer; display: inline-block; border-radius: 5px; text-transform: capitalize; background-color: #348eda; margin: 0; border-color: #348eda; border-style: solid; border-width: 10px 20px;" href=${url} >Email Verify</a></td></tr>` +
+         
+            '<tr><td>Regards:  Admin</td></tr>' 
+        
+
+//    template: {
+//        name: 'Email-Template/main.handlebars',
+//        engine: 'handlebars',
+//     }
+        
+};
     
+transport.sendMail(mailOptions, (err, info) => {
+    if(err){
+        console.log(err);
+        res.status(400).send(err);
+    }
+    else{
+        console.log(info);
+        res.send(info.message);
+    }
+    
+})
+
+    });
 
 
+// email verified 
+router.route('/emailVerify/:email').get(async (req, res) => {
 
+    try{
+     const user = await User.findOne({email: req.params.email})
+     user.email_verified = true;
+     await user.save();
+     return res.redirect('http://localhost:5000/login');
+} catch(err){
+    return res.status(400).send(err);
+}
 });
 
 module.exports = router;

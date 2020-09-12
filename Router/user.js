@@ -7,6 +7,8 @@ const verify = require('../middleware/userTokenVerify');
 const ipLog = require('../functions/ipLogs');
 
 
+
+
 // Validation
  const registerSchema = joi.object({
      username: joi.string().required(),
@@ -95,7 +97,7 @@ const ipLog = require('../functions/ipLogs');
              expiresIn: '2 days'
          }
           );
-          res.json({
+          res.header('auth',token).json({
               user:{
                   id: userSaved._id,
                   username: userSaved.username,
@@ -121,11 +123,16 @@ router.route('/login').post( async (req,res)=> {
   
   const email = req.body.email;
   const password = req.body.password;
-  
+  // check email 
   const user = await User.findOne({email});
    if(!user){
-    res.status(400).send("Invalid Email");
+    return res.status(400).send({
+        type: 'Invalid_Email',
+        message: 'Your email is incorrect'
+    });
   }
+
+  
  
 //   const salt  = await bcrypt.genSalt(10);
 //   const hashPassword = await bcrypt.hashSync(password,salt);
@@ -135,11 +142,22 @@ router.route('/login').post( async (req,res)=> {
 //      res.send("updated");
 //  }
 
-
+// check password
   const verifyPass = await bcrypt.compare(password, user.password);
   if(!verifyPass){
-    res.status(400).send("inValid password");
+    return  res.status(400).send({
+        type: 'Invalid_password',
+        message: 'Your password is incorrect'
+    });
   }
+ // check email is verified or not 
+if (!user.email_verified) {
+    return res.status(400).send({
+        type:"Email_Validation",
+        message:'Your email is not verified, please verify your email'
+    });
+}
+
   ipLog(user._id, user.username);
   const token = jwt.sign({
       id: user._id,

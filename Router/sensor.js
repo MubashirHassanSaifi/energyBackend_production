@@ -153,7 +153,7 @@ router.route('/delete').delete(async(req,res)=>{
 
 //-----------------------------------------------updata sensor----------------------------------------------
 router.route('/update/:id').post( async(req,res)=>{
-   try{
+try{
    const {error} = sensorUpdateSchema.validateAsync(req.body);
    } catch(error){
       res.status(400).send(error.details[0].message);

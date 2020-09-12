@@ -3,29 +3,29 @@ const moment =require('moment');
 const Ulog=require('../../Model/Logs/U.model');
 const updateNotify = require('../updateNotify');
 
-const update_U=async(io,sensorid,userid,U)=>{
+const update_U=async(io, sensorid ,userid ,U ,res)=>{
     try{
-        const sensor =await EnergySensor.findById(sensorid);
+        const sensor = await EnergySensor.findById(sensorid);
       
-        if(sensor.U!==U){
-            sensor.U=U;
-            if(sensor.Ulogid=== null || sensor.Ulogid=== undefined)
+        if(sensor.U !== U){
+            sensor.U = U;
+            if(sensor.Ulogid === null || sensor.Ulogid === undefined)
             {
-                const logU=new Ulog({
-                    userid:userid,
-                    U:U,
-                    created_At:moment().format('MMMM Do YYYY, h:mm:ss a'),
-                    updated_At:null
+                const logU = new Ulog({
+                    userid,
+                    U,
+                    created_At: moment().format('MMMM Do YYYY, h:mm:ss a'),
+                    updated_At: moment().format('MMMM Do YYYY, h:mm:ss a'),
                 });
             
             try{
-                const logSaved   =await logU.save();
+                const logSaved = await logU.save();
                 if(logSaved){
                   console.log(`Ulog is created`);  
                     //get the logid
                   const logid = logSaved._id;
                     // update the sensor Valogid
-                    sensor.Ulogid=logid;
+                    sensor.Ulogid = logid;
                     //save the changes
                    
                    try{
@@ -33,7 +33,7 @@ const update_U=async(io,sensorid,userid,U)=>{
                     if(updated) {
                         console.log(`Ulogid is updated`)
                         updateNotify(io, sensorid, userid, 'U', U);
-                        // res.status(200).json('logs are created');
+                        res.status(200).json('logs are created');
                         
                        }
                        
@@ -55,7 +55,7 @@ const update_U=async(io,sensorid,userid,U)=>{
             
             else{
                   
-                const Ulogid= sensor.Ulogid;
+                const Ulogid = sensor.Ulogid;
           
         
           try{
@@ -64,10 +64,10 @@ const update_U=async(io,sensorid,userid,U)=>{
                //Check the updatedAt   
                
                    //update the date
-                   UlogFound.updated_At=moment().format('MMMM Do YYYY, h:mm:ss a');
+                   UlogFound.updated_At = moment().format('MMMM Do YYYY, h:mm:ss a');
                  
                    try{
-                    const updateLog =await UlogFound.save();
+                    const updateLog = await UlogFound.save();
                        if(updateLog)
                        console.log(`Ulog createdAt is updated`);
                    }
@@ -83,21 +83,21 @@ const update_U=async(io,sensorid,userid,U)=>{
           }
         
            //add the new Vclog
-           const newlogU=new Ulog({
-               userid:sensor.userid,
-               U:U,
-               created_At:moment().format('MMMM Do YYYY, h:mm:ss a'),
-               updated_At:null
+           const newlogU = new Ulog({
+               userid: sensor.userid,
+               U,
+               created_At: moment().format('MMMM Do YYYY, h:mm:ss a'),
+               updated_At: moment().format('MMMM Do YYYY, h:mm:ss a'),
            });
         
         try{
-            const newlogSaved   =await newlogU.save();
+            const newlogSaved = await newlogU.save();
            if(newlogSaved){
              console.log(`new Ulog is created`);  
                //get the logid
              const newlogid = newlogSaved._id;
                // update the sensor Valogid
-               sensor.Ulogid=newlogid;
+               sensor.Ulogid = newlogid;
                //save the changes
               
               try{
@@ -105,7 +105,7 @@ const update_U=async(io,sensorid,userid,U)=>{
                if(updated) {
                    updateNotify(io, sensorid, userid, 'U', U);
                    console.log(`new Ulogid is updated`)
-                //    res.status(200).json('new logs are created')
+                res.status(200).json('logs are created')
                   }
                   
               }
@@ -131,21 +131,21 @@ const update_U=async(io,sensorid,userid,U)=>{
             
                      if(sensor.Ulogid === null || sensor.Ulogid === undefined)
                      {
-                         const logU=new Ulog({
-                             userid:userid,
-                             U:U,
-                             created_At:moment().format('MMMM Do YYYY, h:mm:ss a'),
-                             updated_At:null
+                         const logU = new Ulog({
+                             userid,
+                             U,
+                             created_At: moment().format('MMMM Do YYYY, h:mm:ss a'),
+                             updated_At: moment().format('MMMM Do YYYY, h:mm:ss a'),
                          });
                      
                      try{
-                        const logSaved   =await logU.save();
+                        const logSaved = await logU.save();
                          if(logSaved){
                            console.log(`Ulog is created`);  
                              //get the logid
                            const logid = logSaved._id;
                              // update the sensor Valogid
-                             sensor.Ulogid=logid;
+                             sensor.Ulogid = logid;
                              //save the changes
                            
                             try{
@@ -173,17 +173,17 @@ const update_U=async(io,sensorid,userid,U)=>{
                      else {
                        
                           try{
-                            const logU  =await Ulog.findById(sensor.Ulogid);
+                            const logU  = await Ulog.findById(sensor.Ulogid);
                               if(logU){
                                   
-                                     logU.updated_At=moment().format('MMMM Do YYYY, h:mm:ss a');
+                                     logU.updated_At = moment().format('MMMM Do YYYY, h:mm:ss a');
                                      
                                      try{
-                                        const logupdate  =await logU.save();
+                                        const logupdate  = await logU.save();
                                          if(logupdate)
                                          console.log(`Ulog with same value is updated`);
                                         
-                                        //  res.status(200).json(`logs with same values are updated`);
+                                        res.status(200).json(`logs with same values are updated`);
                                      }
                                      catch(err){
                                         //   res.status(400).json(`Ulog with same value is not update due to ${err}`);
@@ -193,7 +193,7 @@ const update_U=async(io,sensorid,userid,U)=>{
                               }
                           }
                           catch(err){
-                                //  res.status(400).json(`Ulog is not create due to ${err}`);
+                                  res.status(400).json(`Ulog is not create due to ${err}`);
                           }   
                           
                      }
@@ -207,4 +207,4 @@ const update_U=async(io,sensorid,userid,U)=>{
  console.log(`sensor is not found due to ${err}`)
     }
 }
-module.exports=update_U
+module.exports = update_U

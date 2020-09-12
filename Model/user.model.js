@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
-const { boolean } = require('@hapi/joi');
+
 
 const Schema = mongoose.Schema;
 
@@ -26,6 +26,7 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    email_verified: {type: Boolean, default: false},
     phone: {
         type: String,
         default:null
