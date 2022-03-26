@@ -19,7 +19,7 @@
     "lodash": "^4.17.19",
     "mailgun-js": "^0.22.0",
     "mime": "^2.4.6",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "moment": "^2.27.0",
     "mongoose": "^5.9.25",
     "ngrok": "^3.2.7",
