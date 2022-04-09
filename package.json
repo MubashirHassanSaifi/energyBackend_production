@@ -20,7 +20,7 @@
     "mailgun-js": "^0.22.0",
     "mime": "^2.4.6",
     "minimist": "^1.2.5",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "mongoose": "^5.9.25",
     "ngrok": "^3.2.7",
     "node-cron": "^2.0.3",
